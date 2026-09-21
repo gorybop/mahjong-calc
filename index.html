@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>麻雀点数計算アプリ Ver2.04</title>
+    <title>麻雀点数計算アプリ Ver2.05</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -270,7 +270,7 @@
 <body>
 
 <div class="container">
-    <h1>麻雀点数計算アプリ <span style="font-size:0.8rem; color:#666;">Ver2.04</span></h1>
+    <h1>麻雀点数計算アプリ <span style="font-size:0.8rem; color:#666;">Ver2.05</span></h1>
 
     <!-- 1. 状況・アガリ方 ＆ 本場 -->
     <div class="card">
@@ -432,7 +432,7 @@
                 <label id="lbl-chinitsu"><input type="checkbox" name="yaku" value="chinitsu" onchange="calculate()"> 清一色 <span style="font-size:0.75rem; color:#666;">(6/5)</span></label>
 
                 <label id="lbl-sanshoku-dojun"><input type="checkbox" name="yaku" value="sanshokuDojun" onchange="calculate()"> 三色同順 (2/1)</label>
-                <label id="lbl-sanshoku-dokoku"><input type="checkbox" name="yaku" value="sanshokuDokoku" onchange="calculate()"> 三色同刻 (2)</label>
+                <label id="lbl-sanshoku-dokoku"><input type="checkbox" name="yaku" value="sanshokuDokoku" onchange="calculate()"> 三色同刻 (2/1)</label>
 
                 <label id="lbl-ipeko"><input type="checkbox" name="yaku" value="ipeko" onchange="calculate()"> 一盃口 (1)</label>
                 <label id="lbl-ryanpeko"><input type="checkbox" name="yaku" value="ryanpeko" onchange="calculate()"> 二盃口 (3)</label>
@@ -865,7 +865,7 @@
 
         // --- 自動判定役 ---
         const canPinfu = (shuntsuCount === 4 && !hasKotsu && waitTypeFu === 0 && headType !== 'yakpai' && !hasNaki);
-        const canMenzento = (!hasNaki && winType === 'tsumo'); // 門前清自モ和
+        const canMenzento = (!hasNaki && winType === 'tsumo');
         const isToitoi = (shuntsuCount === 0);
         const isSanankou = (darkKotsuCount >= 3);
         const isSankantsu = (kantsuCount >= 3);
@@ -918,6 +918,12 @@
 
         // 小三元は頭が役牌のときのみ選択可能
         setYaoDisabled('lbl-shousangen', headType !== 'yakpai');
+
+        // 混老頭自動成立時はチャンタ・ジュンチャンをグレーアウト
+        if (isHonroutouAuto) {
+            setYaoDisabled('lbl-chanta', true);
+            setYaoDisabled('lbl-junchan', true);
+        }
 
         setYaoDisabled('lbl-rinshan', winType === 'ron');
         setYaoDisabled('lbl-chankan', winType === 'tsumo');
@@ -975,12 +981,12 @@
             if (id === 'chinitsu') totalHan += hasNaki ? 5 : 6;
             if (id === 'sanshokuDojun') totalHan += hasNaki ? 1 : 2;
             if (id === 'ikkantsu') totalHan += hasNaki ? 1 : 2;
-            if (id === 'sanshokuDokoku') totalHan += 2;
+            if (id === 'sanshokuDokoku') totalHan += hasNaki ? 1 : 2; // 三色同刻の食い下がり対応（門前2 / 鳴き1）
             if (id === 'ipeko') totalHan += 1;
             if (id === 'ryanpeko') totalHan += 3;
             if (id === 'chanta') totalHan += hasNaki ? 1 : 2;
             if (id === 'junchan') totalHan += hasNaki ? 2 : 3;
-            if (id === 'shousangen') totalHan += 4; // 小三元は実質4翻（小三元2+役牌2相当）
+            if (id === 'shousangen') totalHan += 4; // 小三元は実質4翻
             if (['rinshan', 'chankan', 'haitei', 'houtei'].includes(id)) totalHan += 1;
         });
 
